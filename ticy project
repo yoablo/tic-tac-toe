@@ -1,0 +1,182 @@
+import pygame
+
+class TicTacToe:
+
+    def __init__(self):
+
+        pygame.init()
+
+        self.WIDTH = 1280
+        self.HEIGHT = 720
+
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        pygame.display.set_caption("Tic Tac Toe")
+
+        self.clock = pygame.time.Clock()
+
+        self.running = True
+
+        self.cell_width = self.WIDTH // 3
+        self.cell_height = self.HEIGHT // 3
+
+        self.X_size = 70
+        self.O_size = 100
+
+        #if I want to make an ending
+        self.font = pygame.font.SysFont(None, 60)
+
+        self.reset_game()
+
+    def reset_game(self):
+
+        self.is_game_over = False
+
+        self.current_is_x = True
+
+        self.board = [
+            [None, None, None],
+            [None, None, None],
+            [None, None, None]
+        ]
+
+    def game_over(self):
+
+        if self.current_is_x ==  True:
+            text_surface = self.font.render("O is winner", True, "yellow")
+            self.screen.blit(text_surface, (self.WIDTH / 2 - 100, self.HEIGHT / 2 - 30))
+            self.is_game_over = True
+            return
+
+        text_surface = self.font.render("X is winner", True, "yellow")
+        self.screen.blit(text_surface, (self.WIDTH / 2 - 100, self.HEIGHT / 2 - 30))
+        self.is_game_over = True
+        return
+
+    def game_logic(self):
+
+        cell_count = 0
+
+        if self.board[0][0] == self.board[1][1] == self.board[2][2] != None or self.board[0][2] == self.board[1][1] == self.board[2][0] != None:
+            self.game_over()
+
+        elif self.board[0][0] == self.board[1][0] == self.board[2][0] != None or self.board[0][1] == self.board[1][1] == self.board[2][1] != None or self.board[0][2] == self.board[1][2] == self.board[2][2] != None:
+            self.game_over()
+
+        else:
+            for row in self.board:
+                if row[0] == row[1] == row[2] != None:
+                    self.game_over()
+
+                else:
+                    for cell in row:
+                        if cell is not None:
+                            cell_count = cell_count + 1
+
+                    if cell_count == 9:
+                        text_surface = self.font.render("game over", True, "yellow")
+                        self.screen.blit(text_surface, (self.WIDTH / 2 - 100, self.HEIGHT / 2 - 30))
+
+    def draw_grid(self):
+
+        pygame.draw.line( self.screen,"white",(self.cell_width, 0),(self.cell_width, self.HEIGHT), 10)
+        pygame.draw.line(self.screen,"white",(self.cell_width * 2, 0),(self.cell_width * 2, self.HEIGHT), 10 )
+        pygame.draw.line( self.screen, "white",(0, self.cell_height), (self.WIDTH, self.cell_height),10 )
+        pygame.draw.line( self.screen,"white",(0, self.cell_height * 2),(self.WIDTH, self.cell_height * 2),10 )
+
+    def draw_x(self, center):
+
+        x, y = center
+
+        pygame.draw.line( self.screen,"red",(x - self.X_size, y - self.X_size), (x + self.X_size, y + self.X_size),10 )
+
+        pygame.draw.line(   self.screen,"red",  (x + self.X_size, y - self.X_size), (x - self.X_size, y + self.X_size), 10)
+
+    def draw_circle(self, center):
+
+        pygame.draw.circle( self.screen, "blue",  center, self.O_size,  10 )
+
+    def get_cell_center(self, row, col):
+
+        center_x = col * self.cell_width + self.cell_width // 2
+        center_y = row * self.cell_height + self.cell_height // 2
+
+        return (center_x, center_y)
+
+    def handle_click(self, pos):
+
+        x, y = pos
+
+        col = x // self.cell_width
+        row = y // self.cell_height
+
+        # Prevent overwriting
+        if self.board[row][col] is not None:
+            return
+
+        if self.current_is_x:
+            self.board[row][col] = "X"
+        else:
+            self.board[row][col] = "O"
+
+        self.current_is_x = not self.current_is_x
+
+    def draw_signs(self):
+
+        for row in range(3):
+            for col in range(3):
+
+                value = self.board[row][col]
+
+                if value is None:
+                    continue
+
+                center = self.get_cell_center(row, col)
+
+                if value == "X":
+                    self.draw_x(center)
+                else:
+                    self.draw_circle(center)
+
+    def handle_events(self):
+
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                self.running = False
+
+            if not self.is_game_over:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    self.handle_click(event.pos)
+
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_q]:
+                self.running = False
+            if keys[pygame.K_r]:
+                self.reset_game()
+
+    def actions(self):
+
+        self.screen.fill("black")
+
+        self.draw_grid()
+
+        self.draw_signs()
+
+        self.game_logic()
+
+        pygame.display.flip()
+
+    def run(self):
+
+        while self.running:
+
+            self.handle_events()
+
+            self.actions()
+
+            self.clock.tick(60)
+
+        pygame.quit()
+
+game = TicTacToe()
+game.run()
