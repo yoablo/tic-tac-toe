@@ -1,5 +1,6 @@
 import pygame
 
+
 class TicTacToe:
 
     def __init__(self):
@@ -22,7 +23,14 @@ class TicTacToe:
         self.X_size = 70
         self.O_size = 100
 
-        #if I want to make an ending
+        self.X_width = 10
+        self.line_width = 10
+        self.circle_width = 10
+
+        # half the width and height of text
+        self.corrective_val_text_width_1 = 100
+        self.corrective_val_text_height_1 = 30
+
         self.font = pygame.font.SysFont(None, 60)
 
         self.reset_game()
@@ -41,14 +49,16 @@ class TicTacToe:
 
     def game_over(self):
 
-        if self.current_is_x ==  True:
+        if self.current_is_x == True:
             text_surface = self.font.render("O is winner", True, "yellow")
-            self.screen.blit(text_surface, (self.WIDTH / 2 - 100, self.HEIGHT / 2 - 30))
+            self.screen.blit(text_surface, (self.WIDTH / 2 - self.corrective_val_text_width_1,
+                                            self.HEIGHT / 2 - self.corrective_val_text_height_1))
             self.is_game_over = True
             return
 
         text_surface = self.font.render("X is winner", True, "yellow")
-        self.screen.blit(text_surface, (self.WIDTH / 2 - 100, self.HEIGHT / 2 - 30))
+        self.screen.blit(text_surface, (self.WIDTH / 2 - self.corrective_val_text_width_1,
+                                        self.HEIGHT / 2 - self.corrective_val_text_height_1))
         self.is_game_over = True
         return
 
@@ -56,10 +66,12 @@ class TicTacToe:
 
         cell_count = 0
 
-        if self.board[0][0] == self.board[1][1] == self.board[2][2] != None or self.board[0][2] == self.board[1][1] == self.board[2][0] != None:
+        if self.board[0][0] == self.board[1][1] == self.board[2][2] != None or self.board[0][2] == self.board[1][1] == \
+                self.board[2][0] != None:
             self.game_over()
 
-        elif self.board[0][0] == self.board[1][0] == self.board[2][0] != None or self.board[0][1] == self.board[1][1] == self.board[2][1] != None or self.board[0][2] == self.board[1][2] == self.board[2][2] != None:
+        elif self.board[0][0] == self.board[1][0] == self.board[2][0] != None or self.board[0][1] == self.board[1][1] == \
+                self.board[2][1] != None or self.board[0][2] == self.board[1][2] == self.board[2][2] != None:
             self.game_over()
 
         else:
@@ -74,26 +86,30 @@ class TicTacToe:
 
                     if cell_count == 9:
                         text_surface = self.font.render("game over", True, "yellow")
-                        self.screen.blit(text_surface, (self.WIDTH / 2 - 100, self.HEIGHT / 2 - 30))
+                        self.screen.blit(text_surface, (self.WIDTH / 2 - self.corrective_val_text_width_1,
+                                                        self.HEIGHT / 2 - self.corrective_val_text_height_1))
 
     def draw_grid(self):
 
-        pygame.draw.line( self.screen,"white",(self.cell_width, 0),(self.cell_width, self.HEIGHT), 10)
-        pygame.draw.line(self.screen,"white",(self.cell_width * 2, 0),(self.cell_width * 2, self.HEIGHT), 10 )
-        pygame.draw.line( self.screen, "white",(0, self.cell_height), (self.WIDTH, self.cell_height),10 )
-        pygame.draw.line( self.screen,"white",(0, self.cell_height * 2),(self.WIDTH, self.cell_height * 2),10 )
+        pygame.draw.line(self.screen, "white", (self.cell_width, 0), (self.cell_width, self.HEIGHT), self.line_width)
+        pygame.draw.line(self.screen, "white", (self.cell_width * 2, 0), (self.cell_width * 2, self.HEIGHT),
+                         self.line_width)
+        pygame.draw.line(self.screen, "white", (0, self.cell_height), (self.WIDTH, self.cell_height), self.line_width)
+        pygame.draw.line(self.screen, "white", (0, self.cell_height * 2), (self.WIDTH, self.cell_height * 2),
+                         self.line_width)
 
     def draw_x(self, center):
 
         x, y = center
 
-        pygame.draw.line( self.screen,"red",(x - self.X_size, y - self.X_size), (x + self.X_size, y + self.X_size),10 )
-
-        pygame.draw.line(   self.screen,"red",  (x + self.X_size, y - self.X_size), (x - self.X_size, y + self.X_size), 10)
+        pygame.draw.line(self.screen, "red", (x - self.X_size, y - self.X_size), (x + self.X_size, y + self.X_size),
+                         self.X_width)
+        pygame.draw.line(self.screen, "red", (x + self.X_size, y - self.X_size), (x - self.X_size, y + self.X_size),
+                         self.X_width)
 
     def draw_circle(self, center):
 
-        pygame.draw.circle( self.screen, "blue",  center, self.O_size,  10 )
+        pygame.draw.circle(self.screen, "blue", center, self.O_size, self.circle_width)
 
     def get_cell_center(self, row, col):
 
@@ -169,7 +185,6 @@ class TicTacToe:
     def run(self):
 
         while self.running:
-
             self.handle_events()
 
             self.actions()
@@ -177,6 +192,7 @@ class TicTacToe:
             self.clock.tick(60)
 
         pygame.quit()
+
 
 game = TicTacToe()
 game.run()
