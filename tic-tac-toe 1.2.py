@@ -1,5 +1,8 @@
 import pygame
 
+from constants import WIDTH, HEIGHT, screen, clock, running, cell_width, cell_height, X_size, O_size, X_width, \
+    line_width, circle_width, corrective_val_text_width_1, corrective_val_text_height_1
+
 
 class TicTacToe:
 
@@ -7,29 +10,29 @@ class TicTacToe:
 
         pygame.init()
 
-        self.WIDTH = 1280
-        self.HEIGHT = 720
+        self.WIDTH = WIDTH
+        self.HEIGHT = HEIGHT
 
-        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.screen = screen
         pygame.display.set_caption("Tic Tac Toe")
 
-        self.clock = pygame.time.Clock()
+        self.clock = clock
 
-        self.running = True
+        self.running = running  #
 
-        self.cell_width = self.WIDTH // 3
-        self.cell_height = self.HEIGHT // 3
+        self.cell_width = cell_width
+        self.cell_height = cell_height
 
-        self.X_size = 70
-        self.O_size = 100
+        self.X_size = X_size
+        self.O_size = O_size
 
-        self.X_width = 10
-        self.line_width = 10
-        self.circle_width = 10
+        self.X_width = X_width
+        self.line_width = line_width
+        self.circle_width = circle_width
 
         # half the width and height of text
-        self.corrective_val_text_width_1 = 100
-        self.corrective_val_text_height_1 = 30
+        self.corrective_val_text_width_1 = corrective_val_text_width_1
+        self.corrective_val_text_height_1 = corrective_val_text_height_1
 
         self.font = pygame.font.SysFont(None, 60)
 
@@ -47,16 +50,9 @@ class TicTacToe:
             [None, None, None]
         ]
 
-    def game_over(self):
+    def game_over_won(self):
 
-        if self.current_is_x == True:
-            text_surface = self.font.render("O is winner", True, "yellow")
-            self.screen.blit(text_surface, (self.WIDTH / 2 - self.corrective_val_text_width_1,
-                                            self.HEIGHT / 2 - self.corrective_val_text_height_1))
-            self.is_game_over = True
-            return
-
-        text_surface = self.font.render("X is winner", True, "yellow")
+        text_surface = self.font.render(f"{'O' if self.current_is_x else 'X'} is winner", True, "yellow")
         self.screen.blit(text_surface, (self.WIDTH / 2 - self.corrective_val_text_width_1,
                                         self.HEIGHT / 2 - self.corrective_val_text_height_1))
         self.is_game_over = True
@@ -68,16 +64,16 @@ class TicTacToe:
 
         if self.board[0][0] == self.board[1][1] == self.board[2][2] != None or self.board[0][2] == self.board[1][1] == \
                 self.board[2][0] != None:
-            self.game_over()
+            self.game_over_won()
 
         elif self.board[0][0] == self.board[1][0] == self.board[2][0] != None or self.board[0][1] == self.board[1][1] == \
                 self.board[2][1] != None or self.board[0][2] == self.board[1][2] == self.board[2][2] != None:
-            self.game_over()
+            self.game_over_won()
 
         else:
             for row in self.board:
                 if row[0] == row[1] == row[2] != None:
-                    self.game_over()
+                    self.game_over_won()
 
                 else:
                     for cell in row:
