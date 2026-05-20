@@ -2,8 +2,11 @@ import pygame
 
 from constants import WIDTH, HEIGHT, Screen, Clock, Running, Cell_width, Cell_height, X_size, O_size, X_width, \
     Line_width, Circle_width, Corrective_val_text_width_1, Corrective_val_text_height_1, Framerate, Size_font, Colors, \
-    Cells_ammount
+    Cells_ammount, Caption, Board_size
 
+
+# TODO: indication for what side is playing currently
+# TODO: make an easy constant for the (num x num) size of the board, like 4x4
 
 class TicTacToe:
 
@@ -15,11 +18,12 @@ class TicTacToe:
         self.HEIGHT = HEIGHT
 
         self.screen = Screen
-        pygame.display.set_caption("Tic Tac Toe")
+        pygame.display.set_caption(Caption)
 
         self.clock = Clock
 
         self.running = Running
+        self.board_size = Board_size
 
         self.cell_width = Cell_width
         self.cell_height = Cell_height
@@ -46,76 +50,75 @@ class TicTacToe:
 
         self.current_is_x = True
 
-        self.board = [
-            [None, None, None],
-            [None, None, None],
-            [None, None, None]
-        ]
+        self.board = [[None] * self.board_size for _ in range(self.board_size)]
 
     def game_over_won(self):
 
         text_surface = self.font.render(f"{'O' if self.current_is_x else 'X'} is winner", True,
                                         self.Colors.TEXT_COLOR.value)
-        self.screen.blit(text_surface, (self.WIDTH / 2 - self.corrective_val_text_width_1,
-                                        self.HEIGHT / 2 - self.corrective_val_text_height_1))
+        self.screen.blit(text_surface, (self.WIDTH // 2 - self.corrective_val_text_width_1,
+                                        self.HEIGHT // 2 - self.corrective_val_text_height_1))
         self.is_game_over = True
         # TODO no reason for this return RED: done
 
     def Diagonals_check(self):
+        boolean = True
 
         if self.board[0][0] == self.board[1][1] == self.board[2][2] is not None or self.board[0][2] == self.board[1][
             1] == \
                 self.board[2][0] is not None:  # TODO change to is not none RED: done
             self.game_over_won()
-            return False
-        else:
-            return True
+            boolean = False
+
+        return boolean
 
     def vertical_check(self):
+        boolean = True
         if self.board[0][0] == self.board[1][0] == self.board[2][0] is not None or self.board[0][1] == self.board[1][
             1] == \
                 self.board[2][1] is not None or self.board[0][2] == self.board[1][2] == self.board[2][2] is not None:
             self.game_over_won()
-            return False
-        else:
-            return True
+            boolean = False
+
+        return boolean
 
     def horizontal_check(self):
+        boolean = True
         for row in self.board:
             if row[0] == row[1] == row[2] is not None:
                 self.game_over_won()
-                return False
-            else:
-                return True
+                boolean = False
+
+        return boolean
 
     def game_over_draw(self):
+        boolean = True
         cell_count = sum(cell is not None for row in self.board for cell in row)  # how would I know that
 
         if cell_count == Cells_ammount:
             text_surface = self.font.render("game over", True, Colors.TEXT_COLOR.value)
-            self.screen.blit(text_surface, (self.WIDTH / 2 - self.corrective_val_text_width_1))
-            return False
-        else:
-            return True
+            self.screen.blit(text_surface, ((self.WIDTH / 2) - self.corrective_val_text_width_1,
+                                            (self.HEIGHT / 2) - self.corrective_val_text_height_1))
+            boolean = False
+
+        return boolean
 
     def game_logic(self):
-        if self.Diagonals_check():
-            if self.vertical_check():
-                if self.horizontal_check():
-                    if self.game_over_draw():
-                        pass
+
+        if self.Diagonals_check() and self.vertical_check() and self.horizontal_check() and self.game_over_draw():
+            pass
 
     def draw_grid(self):
-        pygame.draw.line(self.screen, Colors.LINE_COLOR.value, (self.cell_width, 0), (self.cell_width, self.HEIGHT),
-                         self.line_width)  # TODO save the colors in an enum RED: done
-        pygame.draw.line(self.screen, Colors.LINE_COLOR.value, (self.cell_width * 2, 0),
-                         (self.cell_width * 2, self.HEIGHT),
-                         self.line_width)
-        pygame.draw.line(self.screen, Colors.LINE_COLOR.value, (0, self.cell_height), (self.WIDTH, self.cell_height),
-                         self.line_width)
-        pygame.draw.line(self.screen, Colors.LINE_COLOR.value, (0, self.cell_height * 2),
-                         (self.WIDTH, self.cell_height * 2),
-                         self.line_width)
+
+        start_pos = self.cell_width
+        for position in range(self.board_size - 1):
+            pygame.draw.line(self.screen, Colors.LINE_COLOR.value, (start_pos,0), (start_pos,self.HEIGHT), self.line_width)
+            start_pos += self.cell_width
+
+        start_pos = self.cell_height
+        for position in range(self.board_size - 1):
+            pygame.draw.line(self.screen, Colors.LINE_COLOR.value, (0,start_pos), (self.WIDTH,start_pos), self.line_width)
+            start_pos += self.cell_height
 
     def draw_x(self, center):
         x, y = center
@@ -148,8 +151,8 @@ class TicTacToe:
             self.current_is_x = not self.current_is_x
 
     def draw_signs(self):
-        for row in range(3):
-            for col in range(3):
+        for row in range(self.board_size):
+            for col in range(self.board_size):
 
                 value = self.board[row][col]
 
