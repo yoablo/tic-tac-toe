@@ -1,12 +1,12 @@
 import pygame
 
-from constants import WIDTH, HEIGHT, Screen, Clock, Running, Cell_width, Cell_height, X_size, O_size, X_width, \
-    Line_width, Circle_width, Corrective_val_text_width_1, Corrective_val_text_height_1, Framerate, Size_font, Colors, \
-    Cells_ammount, Caption, Board_size
+from constants import WIDTH, HEIGHT, SCREEN, CLOCK, RUNNING, CELL_WIDTH, CELL_HEIGHT, X_SIZE, O_SIZE, X_WIDTH, \
+    LINE_WIDTH, CIRCLE_WIDTH, CORRECTIVE_VAL_TEXT_WIDTH_1, CORRECTIVE_VAL_TEXT_HEIGHT_1, FRAMERATE, SIZE_FONT, COLORS, \
+    CELLS_AMMOUNT, CAPTION, BOARD_SIZE, AMMOUNT_TO_WIN
 
 
 # TODO: indication for what side is playing currently
-# TODO: make an easy constant for the (num x num) size of the board, like 4x4
+# TODO: make an easy constant for the (board_size x board_size) size of the board, like 4x4
 
 class TicTacToe:
 
@@ -17,30 +17,34 @@ class TicTacToe:
         self.WIDTH = WIDTH
         self.HEIGHT = HEIGHT
 
-        self.screen = Screen
-        pygame.display.set_caption(Caption)
+        self.screen = SCREEN
+        pygame.display.set_caption(CAPTION)
 
-        self.clock = Clock
+        self.clock = CLOCK
 
-        self.running = Running
-        self.board_size = Board_size
+        self.running = RUNNING
+        self.board_size = BOARD_SIZE
+        self.ammount_to_win = AMMOUNT_TO_WIN
+        self.cells_ammount = CELLS_AMMOUNT
 
-        self.cell_width = Cell_width
-        self.cell_height = Cell_height
+        self.cell_width = CELL_WIDTH
+        self.cell_height = CELL_HEIGHT
 
-        self.X_size = X_size
-        self.O_size = O_size
+        self.X_size = X_SIZE
+        self.O_size = O_SIZE
 
-        self.X_width = X_width
-        self.line_width = Line_width
-        self.circle_width = Circle_width
+        self.X_width = X_WIDTH
+        self.line_width = LINE_WIDTH
+        self.circle_width = CIRCLE_WIDTH
 
         # half the width and height of text
-        self.corrective_val_text_width_1 = Corrective_val_text_width_1
-        self.corrective_val_text_height_1 = Corrective_val_text_height_1
+        self.corrective_val_text_width_1 = CORRECTIVE_VAL_TEXT_WIDTH_1
+        self.corrective_val_text_height_1 = CORRECTIVE_VAL_TEXT_HEIGHT_1
 
-        self.font = pygame.font.SysFont(None, Size_font)
-        self.Colors = Colors
+        self.font = pygame.font.SysFont(None, SIZE_FONT)
+        self.Colors = COLORS
+
+        self.frame_rate = FRAMERATE
 
         self.reset_game()
 
@@ -74,16 +78,18 @@ class TicTacToe:
 
     def vertical_check(self):
         boolean = True
+
         if self.board[0][0] == self.board[1][0] == self.board[2][0] is not None or self.board[0][1] == self.board[1][
-            1] == \
-                self.board[2][1] is not None or self.board[0][2] == self.board[1][2] == self.board[2][2] is not None:
+            1] == self.board[2][1] is not None or self.board[0][2] == self.board[1][2] == self.board[2][2] is not None:
             self.game_over_won()
+
             boolean = False
 
         return boolean
 
     def horizontal_check(self):
         boolean = True
+
         for row in self.board:
             if row[0] == row[1] == row[2] is not None:
                 self.game_over_won()
@@ -95,8 +101,8 @@ class TicTacToe:
         boolean = True
         cell_count = sum(cell is not None for row in self.board for cell in row)  # how would I know that
 
-        if cell_count == Cells_ammount:
-            text_surface = self.font.render("game over", True, Colors.TEXT_COLOR.value)
+        if cell_count == self.cells_ammount:
+            text_surface = self.font.render("game over", True, self.Colors.TEXT_COLOR.value)
             self.screen.blit(text_surface, ((self.WIDTH / 2) - self.corrective_val_text_width_1,
                                             (self.HEIGHT / 2) - self.corrective_val_text_height_1))
             boolean = False
@@ -112,26 +118,28 @@ class TicTacToe:
 
         start_pos = self.cell_width
         for position in range(self.board_size - 1):
-            pygame.draw.line(self.screen, Colors.LINE_COLOR.value, (start_pos,0), (start_pos,self.HEIGHT), self.line_width)
+            pygame.draw.line(self.screen, self.Colors.LINE_COLOR.value, (start_pos, 0), (start_pos, self.HEIGHT),
+                             self.line_width)
             start_pos += self.cell_width
 
         start_pos = self.cell_height
         for position in range(self.board_size - 1):
-            pygame.draw.line(self.screen, Colors.LINE_COLOR.value, (0,start_pos), (self.WIDTH,start_pos), self.line_width)
+            pygame.draw.line(self.screen, self.Colors.LINE_COLOR.value, (0, start_pos), (self.WIDTH, start_pos),
+                             self.line_width)
             start_pos += self.cell_height
 
     def draw_x(self, center):
         x, y = center
 
-        pygame.draw.line(self.screen, Colors.X_COLOR.value, (x - self.X_size, y - self.X_size),
+        pygame.draw.line(self.screen, self.Colors.X_COLOR.value, (x - self.X_size, y - self.X_size),
                          (x + self.X_size, y + self.X_size),
                          self.X_width)
-        pygame.draw.line(self.screen, Colors.X_COLOR.value, (x + self.X_size, y - self.X_size),
+        pygame.draw.line(self.screen, self.Colors.X_COLOR.value, (x + self.X_size, y - self.X_size),
                          (x - self.X_size, y + self.X_size),
                          self.X_width)
 
     def draw_circle(self, center):
-        pygame.draw.circle(self.screen, Colors.O_COLOR.value, center, self.O_size, self.circle_width)
+        pygame.draw.circle(self.screen, self.Colors.O_COLOR.value, center, self.O_size, self.circle_width)
 
     def get_cell_center(self, row, col):
         center_x = col * self.cell_width + self.cell_width // 2
@@ -183,7 +191,7 @@ class TicTacToe:
                 self.reset_game()
 
     def actions(self):
-        self.screen.fill(Colors.BLACK.value)
+        self.screen.fill(self.Colors.BLACK.value)
 
         self.draw_grid()
 
@@ -199,7 +207,7 @@ class TicTacToe:
 
             self.actions()
 
-            self.clock.tick(Framerate)
+            self.clock.tick(self.frame_rate)
 
         pygame.quit()
 
