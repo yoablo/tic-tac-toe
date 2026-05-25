@@ -9,8 +9,6 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 CLOCK = pygame.time.Clock()
 CAPTION = "Tic Tac Toe"
 
-RUNNING = True
-
 SIZE_FONT = 60
 
 # RED
@@ -35,6 +33,7 @@ CORRECTIVE_VAL_TEXT_WIDTH_1 = 100
 CORRECTIVE_VAL_TEXT_HEIGHT_1 = 30
 
 FRAMERATE = 60
+
 
 class COLORS(Enum):
     BLACK = (0, 0, 0)
