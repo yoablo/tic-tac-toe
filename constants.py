@@ -1,27 +1,48 @@
 import pygame
+from enum import Enum
 
-X_SIZE = 70
 WIDTH = 1280
 HEIGHT = 720
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 
-clock = pygame.time.Clock()
+CLOCK = pygame.time.Clock()
+CAPTION = "Tic Tac Toe"
 
-running = True
+RUNNING = True
 
-cell_width = WIDTH // 3
-cell_height = HEIGHT // 3
+SIZE_FONT = 60
 
-X_size = X_SIZE
-O_size = 100
+# RED
+BOARD_SIZE = 5
+AMMOUNT_TO_WIN = 3
+# RED
 
-X_width = 10
-line_width = 10
-circle_width = 10
+CELLS_AMMOUNT = BOARD_SIZE ** 2
+
+CELL_WIDTH = WIDTH // BOARD_SIZE
+CELL_HEIGHT = HEIGHT // BOARD_SIZE
+
+X_SIZE = 250 // BOARD_SIZE
+O_SIZE = 250 // BOARD_SIZE
+
+X_WIDTH = 10
+LINE_WIDTH = 10
+CIRCLE_WIDTH = 10
 
 # half the width and height of text
-corrective_val_text_width_1 = 100
-corrective_val_text_height_1 = 30
+CORRECTIVE_VAL_TEXT_WIDTH_1 = 100
+CORRECTIVE_VAL_TEXT_HEIGHT_1 = 30
 
-#font = pygame.font.SysFont(None, 60)
+FRAMERATE = 60
+
+class COLORS(Enum):
+    BLACK = (0, 0, 0)
+
+    LINE_COLOR = (255, 255, 255)
+
+    X_COLOR = (255, 0, 0)
+
+    O_COLOR = (0, 0, 255)
+
+    TEXT_COLOR = (255, 255, 0)
