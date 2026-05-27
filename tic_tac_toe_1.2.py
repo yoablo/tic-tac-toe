@@ -4,7 +4,6 @@ from constants import WIDTH, HEIGHT, SCREEN, CLOCK, CELL_WIDTH, CELL_HEIGHT, X_S
     LINE_WIDTH, CIRCLE_WIDTH, CORRECTIVE_VAL_TEXT_WIDTH_1, CORRECTIVE_VAL_TEXT_HEIGHT_1, FRAMERATE, SIZE_FONT, COLORS, \
     CELLS_AMMOUNT, CAPTION, BOARD_SIZE, AMMOUNT_TO_WIN
 
-
 class TicTacToe:
 
     def __init__(self):
@@ -90,9 +89,7 @@ class TicTacToe:
         found_winner = False
 
         if self.check_cells_near(row, cell, 1, 1) or \
-                self.check_cells_near(row, cell, -1, 1) or \
-                self.check_cells_near(row, cell, 1, -1) or \
-                self.check_cells_near(row, cell, -1, -1):
+                self.check_cells_near(row, cell, -1, 1):
             found_winner = True
             self.game_over_won()
 
@@ -119,11 +116,10 @@ class TicTacToe:
     def game_logic(self):
         for row in range(self.board_size):
             for cell in range(self.board_size):
-                if self.diagonals_check(cell, row) or \
-                        self.vertical_check(cell, row) or \
-                        self.horizontal_check(cell, row) or \
-                        self.game_over_draw():
-                    pass
+                if not self.diagonals_check(cell, row) and \
+                    not self.vertical_check(cell, row) and \
+                    not self.horizontal_check(cell, row):
+                        self.game_over_draw()
 
     def draw_grid(self):
 
@@ -192,9 +188,6 @@ class TicTacToe:
                 else:
                     self.draw_circle(center)
 
-        if not self.is_game_over:
-            self.show_current_player_sigh()
-
     def handle_events(self):
         for event in pygame.event.get():
 
@@ -202,7 +195,7 @@ class TicTacToe:
                 self.running = False
 
             if not self.is_game_over:
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     self.handle_click(event.pos)
 
             keys = pygame.key.get_pressed()
@@ -218,6 +211,9 @@ class TicTacToe:
 
         self.draw_signs()
 
+        if not self.is_game_over:
+            self.show_current_player_sigh()
+
         self.game_logic()
 
         pygame.display.flip()
@@ -231,7 +227,6 @@ class TicTacToe:
             self.clock.tick(self.frame_rate)
 
         pygame.quit()
-
 
 game = TicTacToe()
 game.run()
