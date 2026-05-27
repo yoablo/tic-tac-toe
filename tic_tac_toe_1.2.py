@@ -1,11 +1,8 @@
 import pygame
 
-from constants import WIDTH, HEIGHT, SCREEN, CLOCK, RUNNING, CELL_WIDTH, CELL_HEIGHT, X_SIZE, O_SIZE, X_WIDTH, \
+from constants import WIDTH, HEIGHT, SCREEN, CLOCK, CELL_WIDTH, CELL_HEIGHT, X_SIZE, O_SIZE, X_WIDTH, \
     LINE_WIDTH, CIRCLE_WIDTH, CORRECTIVE_VAL_TEXT_WIDTH_1, CORRECTIVE_VAL_TEXT_HEIGHT_1, FRAMERATE, SIZE_FONT, COLORS, \
     CELLS_AMMOUNT, CAPTION, BOARD_SIZE, AMMOUNT_TO_WIN
-
-# TODO: indication for what side is playing currently
-# TODO: make an easy constant for the (board_size x board_size) size of the board, like 4x4
 
 class TicTacToe:
 
@@ -13,15 +10,15 @@ class TicTacToe:
 
         pygame.init()
 
-        self.WIDTH = WIDTH
-        self.HEIGHT = HEIGHT
+        self.width = WIDTH
+        self.height = HEIGHT
 
         self.screen = SCREEN
         pygame.display.set_caption(CAPTION)
 
         self.clock = CLOCK
 
-        self.running = RUNNING
+        self.running = True
         self.board_size = BOARD_SIZE
         self.ammount_to_win = AMMOUNT_TO_WIN
         self.cells_ammount = CELLS_AMMOUNT
@@ -36,7 +33,6 @@ class TicTacToe:
         self.line_width = LINE_WIDTH
         self.circle_width = CIRCLE_WIDTH
 
-        # half the width and height of text
         self.corrective_val_text_width_1 = CORRECTIVE_VAL_TEXT_WIDTH_1
         self.corrective_val_text_height_1 = CORRECTIVE_VAL_TEXT_HEIGHT_1
 
@@ -59,104 +55,83 @@ class TicTacToe:
 
         text_surface = self.font.render(f"{'O' if self.current_is_x else 'X'} is winner", True,
                                         self.Colors.TEXT_COLOR.value)
-        self.screen.blit(text_surface, (self.WIDTH // 2 - self.corrective_val_text_width_1,
-                                        self.HEIGHT // 2 - self.corrective_val_text_height_1))
+        self.screen.blit(text_surface, (self.width // 2 - self.corrective_val_text_width_1,
+                                        self.height // 2 - self.corrective_val_text_height_1))
         self.is_game_over = True
-        # no reason for this return : done
-        # change the program
 
     def game_over_draw(self):
-        func_true = True
-        cell_count = sum(cell is not None for row in self.board for cell in row)  # how would I know that
+        is_draw = False
+        cell_count = sum(cell is not None for row in self.board for cell in row)
 
         if cell_count == self.cells_ammount:
             text_surface = self.font.render("game over", True, self.Colors.TEXT_COLOR.value)
-            self.screen.blit(text_surface, ((self.WIDTH / 2) - self.corrective_val_text_width_1,
-                                            (self.HEIGHT / 2) - self.corrective_val_text_height_1))
-            func_true = False
+            self.screen.blit(text_surface, ((self.width / 2) - self.corrective_val_text_width_1,
+                                            (self.height / 2) - self.corrective_val_text_height_1))
+            is_draw = True
 
-        return func_true
+        return is_draw
 
     def cell_is_in_board(self, row, col):
-        func_true = False
-        if 0 <= row < self.board_size and 0 <= col < self.board_size:
-            func_true = True
-
-        return func_true
+        return 0 <= row < self.board_size and 0 <= col < self.board_size
 
     def check_cells_near(self, row, cell, move1, move2):
-        func_true = True
         counter = 1
+        i = 1
 
-        for i in range(1, self.ammount_to_win):
-            if self.board[row][cell] is not None and self.cell_is_in_board(row + move1 * i, cell + move2 * i) and \
-                    self.board[row][cell] == \
-                    self.board[row + move1 * i][cell + move2 * i]:
-                counter += 1
-            else:
-                break
+        while (self.board[row][cell] is not None and self.cell_is_in_board(row + move1 * i, cell + move2 * i) and
+               self.board[row][cell] == self.board[row + move1 * i][cell + move2 * i] and i != self.ammount_to_win):
+            counter += 1
+            i += 1
 
-        if counter == self.ammount_to_win:
-            func_true = False
-
-        return func_true
+        return counter == self.ammount_to_win
 
     def diagonals_check(self, cell, row):
-        func_true = True
+        found_winner = False
 
-        if self.check_cells_near(row, cell, 1, 1) and \
-                self.check_cells_near(row, cell, -1, 1) and \
-                self.check_cells_near(row, cell, 1, -1) and \
-                self.check_cells_near(row, cell, -1, -1):
-            pass
-        else:
+        if self.check_cells_near(row, cell, 1, 1) or \
+                self.check_cells_near(row, cell, -1, 1):
+            found_winner = True
             self.game_over_won()
-            func_true = False
 
-        return func_true
+        return found_winner
 
     def vertical_check(self, cell, row):
-        func_true = True
+        found_winner = False
 
-        if self.check_cells_near(row, cell, 1, 0) and \
-                self.check_cells_near(row, cell, -1, 0):
-            pass
-        else:
+        if self.check_cells_near(row, cell, 1, 0):
             self.game_over_won()
-            func_true = False
+            found_winner = True
 
-        return func_true
+        return found_winner
 
     def horizontal_check(self, cell, row):
-        func_true = True
+        found_winner = False
 
-        if self.check_cells_near(row, cell, 0, 1) and \
-                self.check_cells_near(row, cell, 0, -1):
-            pass
-        else:
+        if self.check_cells_near(row, cell, 0, 1):
             self.game_over_won()
-            func_true = False
+            found_winner = True
 
-        return func_true
+        return found_winner
 
     def game_logic(self):
         for row in range(self.board_size):
             for cell in range(self.board_size):
-                if self.diagonals_check(cell, row) and self.vertical_check(cell, row) and self.horizontal_check(
-                        cell, row) and self.game_over_draw():
-                    pass
+                if not self.diagonals_check(cell, row) and \
+                    not self.vertical_check(cell, row) and \
+                    not self.horizontal_check(cell, row):
+                        self.game_over_draw()
 
     def draw_grid(self):
 
         start_pos = self.cell_width
         for position in range(self.board_size - 1):
-            pygame.draw.line(self.screen, self.Colors.LINE_COLOR.value, (start_pos, 0), (start_pos, self.HEIGHT),
+            pygame.draw.line(self.screen, self.Colors.LINE_COLOR.value, (start_pos, 0), (start_pos, self.height),
                              self.line_width)
             start_pos += self.cell_width
 
         start_pos = self.cell_height
         for position in range(self.board_size - 1):
-            pygame.draw.line(self.screen, self.Colors.LINE_COLOR.value, (0, start_pos), (self.WIDTH, start_pos),
+            pygame.draw.line(self.screen, self.Colors.LINE_COLOR.value, (0, start_pos), (self.width, start_pos),
                              self.line_width)
             start_pos += self.cell_height
 
@@ -185,12 +160,19 @@ class TicTacToe:
         col = x // self.cell_width
         row = y // self.cell_height
 
-        if self.board[row][col] is None:  # don't use early returns: done
+        if self.board[row][col] is None:
             self.board[row][col] = f"{'X' if self.current_is_x else 'O'}"
 
             self.current_is_x = not self.current_is_x
 
+    def show_current_player_sigh(self):
+        text_surface = self.font.render(f"{'O' if not self.current_is_x else 'X'} is playing", True,
+                                        self.Colors.TEXT_COLOR.value)
+
+        self.screen.blit(text_surface, (0, 0))
+
     def draw_signs(self):
+
         for row in range(self.board_size):
             for col in range(self.board_size):
 
@@ -213,7 +195,7 @@ class TicTacToe:
                 self.running = False
 
             if not self.is_game_over:
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     self.handle_click(event.pos)
 
             keys = pygame.key.get_pressed()
@@ -229,6 +211,9 @@ class TicTacToe:
 
         self.draw_signs()
 
+        if not self.is_game_over:
+            self.show_current_player_sigh()
+
         self.game_logic()
 
         pygame.display.flip()
@@ -242,7 +227,6 @@ class TicTacToe:
             self.clock.tick(self.frame_rate)
 
         pygame.quit()
-
 
 game = TicTacToe()
 game.run()
